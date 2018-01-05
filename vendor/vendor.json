@@ -2802,5 +2802,5 @@
 			"revision": ""
 		}
 	],
-	"rootPath": "bitbucket.org/solidfire/terraform-provider-solidfire"
+	"rootPath": "github.com/cprokopiak/terraform-provider-solidfire"
 }

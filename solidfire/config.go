@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"bitbucket.org/solidfire/terraform-provider-solidfire/solidfire/element"
+	"github.com/cprokopiak/terraform-provider-solidfire/solidfire/element"
 )
 
 type Config struct {

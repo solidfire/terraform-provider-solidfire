@@ -4,8 +4,9 @@ import (
 	"strconv"
 	"testing"
 
-	"bitbucket.org/solidfire/terraform-provider-solidfire/solidfire/element"
 	"fmt"
+
+	"github.com/cprokopiak/terraform-provider-solidfire/solidfire/element"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )

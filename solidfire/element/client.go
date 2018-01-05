@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"sync"
 
-	"bitbucket.org/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
 	"github.com/Sirupsen/logrus"
+	"github.com/cprokopiak/terraform-provider-solidfire/solidfire/element/jsonrpc"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 

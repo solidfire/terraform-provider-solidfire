@@ -7,8 +7,8 @@ import (
 
 	"encoding/json"
 
-	"bitbucket.org/solidfire/terraform-provider-solidfire/solidfire/element"
-	"bitbucket.org/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
+	"github.com/cprokopiak/terraform-provider-solidfire/solidfire/element"
+	"github.com/cprokopiak/terraform-provider-solidfire/solidfire/element/jsonrpc"
 	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
 )

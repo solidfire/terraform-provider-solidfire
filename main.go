@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bitbucket.org/solidfire/terraform-provider-solidfire/solidfire"
+	"github.com/cprokopiak/terraform-provider-solidfire/solidfire"
 	"github.com/hashicorp/terraform/plugin"
 )
 
