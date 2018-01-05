@@ -5,10 +5,10 @@ import (
 	"log"
 	"strconv"
 
-	"encoding/json"
-
 	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/solidfire/solidfire-sdk-golang/sfapi"
+	"github.com/solidfire/solidfire-sdk-golang/sftypes"
 	"github.com/solidfire/terraform-provider-solidfire/solidfire/element"
 	"github.com/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
@@ -75,9 +75,9 @@ func resourceSolidFireAccount() *schema.Resource {
 
 func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("Creating account: %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
-	acct := CreateAccountRequest{}
+	acct := sftypes.AddAccountRequest{}
 
 	if v, ok := d.GetOk("username"); ok {
 		acct.Username = v.(string)
@@ -86,11 +86,15 @@ func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	if v, ok := d.GetOk("initiator_secret"); ok {
-		acct.InitiatorSecret = v.(string)
+		acct.InitiatorSecret = sftypes.CHAPSecret{
+			Secret: v.(string),
+		}
 	}
 
 	if v, ok := d.GetOk("target_secret"); ok {
-		acct.TargetSecret = v.(string)
+		acct.TargetSecret = sftypes.CHAPSecret{
+			Secret: v.(string),
+		}
 	}
 
 	resp, err := createAccount(client, acct)
@@ -106,52 +110,49 @@ func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) er
 	return resourceSolidFireAccountRead(d, meta)
 }
 
-func createAccount(client *element.Client, request CreateAccountRequest) (CreateAccountResult, error) {
-	params := structs.Map(request)
+func createAccount(client *sfapi.Client, request sftypes.AddAccountRequest) (*sftypes.AddAccountResult, error) {
+	log.Printf("Request: %v", request)
 
-	log.Printf("Parameters: %v", params)
-
-	response, err := client.CallAPIMethod("AddAccount", params)
+	response, err := client.AddAccount(request)
 	if err != nil {
 		log.Print("CreateAccount request failed")
-		return CreateAccountResult{}, err
+		return &sftypes.AddAccountResult{}, err
 	}
 
-	var result CreateAccountResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from CreateAccount")
-		return CreateAccountResult{}, err
-	}
-	return result, nil
+	return response, nil
 }
 
 func resourceSolidFireAccountRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("Reading account: %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
 	id := d.Id()
-	convID, convErr := strconv.Atoi(id)
+	convID, convErr := strconv.ParseInt(id, 10, 64)
 
 	if convErr != nil {
 		return fmt.Errorf("id argument is required")
 	}
 
-	res, err := client.GetAccountByID(convID)
+	acct := sftypes.GetAccountByIDRequest{
+		AccountID: convID,
+	}
+
+	res, err := client.GetAccountByID(acct)
 	if err != nil {
 		log.Print("GetAccountByID failed")
 		return err
 	}
 
 	if _, ok := d.GetOk("username"); ok {
-		d.Set("username", res.Username)
+		d.Set("username", res.Account.Username)
 	}
 
 	if _, ok := d.GetOk("initiator_secret"); ok {
-		d.Set("initiator_secret", res.InitiatorSecret)
+		d.Set("initiator_secret", res.Account.InitiatorSecret)
 	}
 
 	if _, ok := d.GetOk("target_secret"); ok {
-		d.Set("target_secret", res.TargetSecret)
+		d.Set("target_secret", res.Account.TargetSecret)
 	}
 
 	return nil
@@ -239,16 +240,20 @@ func removeAccount(client *element.Client, request RemoveAccountRequest) error {
 
 func resourceSolidFireAccountExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	log.Printf("Checking existence of account: %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
 	id := d.Id()
-	convID, convErr := strconv.Atoi(id)
+	convID, convErr := strconv.ParseInt(id, 10, 64)
 
 	if convErr != nil {
 		return false, fmt.Errorf("id argument is required")
 	}
 
-	_, err := client.GetAccountByID(convID)
+	acct := sftypes.GetAccountByIDRequest{
+		AccountID: convID,
+	}
+
+	_, err := client.GetAccountByID(acct)
 	if err != nil {
 		if err, ok := err.(*jsonrpc.ResponseError); ok {
 			if err.Name == "xUnknownAccount" {

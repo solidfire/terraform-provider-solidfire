@@ -1,10 +1,9 @@
 package solidfire
 
 import (
-	"crypto/tls"
-	"net/http"
+	"fmt"
 
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element"
+	"github.com/solidfire/solidfire-sdk-golang/sfapi"
 )
 
 type Config struct {
@@ -27,18 +26,11 @@ type APIError struct {
 	} `json:"error"`
 }
 
-func (c *Config) Client() (*element.Client, error) {
-	client := &element.Client{
-		Host:     "https://" + c.SolidFireServer,
-		Username: c.User,
-		Password: c.Password,
-		HTTPTransport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true},
-		},
+func (c *Config) Client() (*sfapi.Client, error) {
+	client, err := sfapi.Create(c.SolidFireServer, c.User, c.Password, c.APIVersion, 443, 30)
+	if err != nil {
+		fmt.Printf("Received an error trying to create API client: %+v", err)
 	}
-
-	client.SetAPIVersion(c.APIVersion)
 
 	return client, nil
 }
