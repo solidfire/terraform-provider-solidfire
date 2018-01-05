@@ -1966,13 +1966,13 @@
 			"revision": ""
 		},
 		{
-			"checksumSHA1": "IMf0+5T7ddSunBbnN0hG8+p2Ta8=",
+			"checksumSHA1": "Gv+PqYQsEOj8b8WoFke/I3FIaF0=",
 			"path": "github.com/solidfire/solidfire-sdk-golang",
-			"revision": "c775af8c993e7b1fe55f09edd28437f225e700d2",
-			"revisionTime": "2017-04-19T18:59:52Z",
+			"revision": "f26e87d8b4656388f22d24216fe95f96228ccecb",
+			"revisionTime": "2018-01-05T19:27:50Z",
 			"tree": true,
-			"version": "develop",
-			"versionExact": "develop"
+			"version": "feature/Oxygen",
+			"versionExact": "feature/Oxygen"
 		},
 		{
 			"checksumSHA1": "JXUVA1jky8ZX8w09p2t5KLs97Nc=",

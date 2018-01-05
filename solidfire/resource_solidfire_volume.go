@@ -5,45 +5,11 @@ import (
 	"log"
 	"strconv"
 
-	"encoding/json"
-
-	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element"
+	"github.com/solidfire/solidfire-sdk-golang/sfapi"
+	"github.com/solidfire/solidfire-sdk-golang/sftypes"
 	"github.com/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
-
-type CreateVolumeRequest struct {
-	Name       string           `structs:"name"`
-	AccountID  int              `structs:"accountID"`
-	TotalSize  int              `structs:"totalSize"`
-	Enable512E bool             `structs:"enable512e"`
-	Attributes interface{}      `structs:"attributes"`
-	QOS        QualityOfService `structs:"qos"`
-}
-
-type CreateVolumeResult struct {
-	VolumeID int            `json:"volumeID"`
-	Volume   element.Volume `json:"volume"`
-}
-
-type DeleteVolumeRequest struct {
-	VolumeID int `structs:"volumeID"`
-}
-
-type ModifyVolumeRequest struct {
-	VolumeID   int              `structs:"volumeID"`
-	AccountID  int              `structs:"accountID"`
-	Attributes interface{}      `structs:"attributes"`
-	QOS        QualityOfService `structs:"qos"`
-	TotalSize  int              `structs:"totalSize"`
-}
-
-type QualityOfService struct {
-	MinIOPS   int `structs:"minIOPS"`
-	MaxIOPS   int `structs:"maxIOPS"`
-	BurstIOPS int `structs:"burstIOPS"`
-}
 
 func resourceSolidFireVolume() *schema.Resource {
 	return &schema.Resource{
@@ -92,19 +58,15 @@ func resourceSolidFireVolume() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
-			"iqn": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 		},
 	}
 }
 
 func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("Creating volume: %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
-	volume := CreateVolumeRequest{}
+	volume := sftypes.CreateVolumeRequest{}
 
 	if v, ok := d.GetOk("name"); ok {
 		volume.Name = v.(string)
@@ -113,33 +75,33 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if v, ok := d.GetOk("account_id"); ok {
-		volume.AccountID = v.(int)
+		volume.AccountID = int64(v.(int))
 	} else {
 		return fmt.Errorf("account_id argument is required")
 	}
 
 	if v, ok := d.GetOk("total_size"); ok {
-		volume.TotalSize = v.(int)
+		volume.TotalSize = int64(v.(int))
 	} else {
 		return fmt.Errorf("total_size argument is required")
 	}
 
 	if v, ok := d.GetOk("enable512e"); ok {
-		volume.Enable512E = v.(bool)
+		volume.Enable512e = v.(bool)
 	} else {
 		return fmt.Errorf("enable512e argument is required")
 	}
 
 	if v, ok := d.GetOk("min_iops"); ok {
-		volume.QOS.MinIOPS = v.(int)
+		volume.Qos.MinIOPS = int64(v.(int))
 	}
 
 	if v, ok := d.GetOk("max_iops"); ok {
-		volume.QOS.MaxIOPS = v.(int)
+		volume.Qos.MaxIOPS = int64(v.(int))
 	}
 
 	if v, ok := d.GetOk("burst_iops"); ok {
-		volume.QOS.BurstIOPS = v.(int)
+		volume.Qos.BurstIOPS = int64(v.(int))
 	}
 
 	resp, err := createVolume(client, volume)
@@ -149,47 +111,37 @@ func resourceSolidFireVolumeCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.SetId(fmt.Sprintf("%v", resp.VolumeID))
-	d.Set("iqn", resp.Volume.Iqn)
 	log.Printf("Created volume: %v %v", volume.Name, resp.VolumeID)
 
 	return resourceSolidFireVolumeRead(d, meta)
 }
 
-func createVolume(client *element.Client, request CreateVolumeRequest) (CreateVolumeResult, error) {
-	params := structs.Map(request)
-
-	log.Printf("Parameters: %v", params)
-
-	response, err := client.CallAPIMethod("CreateVolume", params)
+func createVolume(client *sfapi.Client, request sftypes.CreateVolumeRequest) (*sftypes.CreateVolumeResult, error) {
+	response, err := client.CreateVolume(request)
 	if err != nil {
 		log.Print("CreateVolume request failed")
-		return CreateVolumeResult{}, err
+		return &sftypes.CreateVolumeResult{}, err
 	}
 
-	var result CreateVolumeResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from CreateVolume")
-		return CreateVolumeResult{}, err
-	}
-	return result, nil
+	return response, nil
 }
 
 func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("Reading volume: %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
-	volumes := element.ListVolumesRequest{}
+	volumes := sftypes.ListVolumesRequest{}
 
 	id := d.Id()
-	s := make([]int, 1)
-	convID, convErr := strconv.Atoi(id)
+	s := make([]int64, 1)
+	convID, convErr := strconv.ParseInt(id, 10, 64)
 
 	if convErr != nil {
 		return fmt.Errorf("id argument is required")
 	}
 
 	s[0] = convID
-	volumes.Volumes = s
+	volumes.VolumeIDs = s
 
 	res, err := listVolumes(client, volumes)
 	if err != nil {
@@ -205,32 +157,24 @@ func resourceSolidFireVolumeRead(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func listVolumes(client *element.Client, request element.ListVolumesRequest) (element.ListVolumesResult, error) {
-	params := structs.Map(request)
-
-	response, err := client.CallAPIMethod("ListVolumes", params)
+func listVolumes(client *sfapi.Client, request sftypes.ListVolumesRequest) (*sftypes.ListVolumesResult, error) {
+	response, err := client.ListVolumes(request)
 	if err != nil {
 		log.Print("ListVolumes request failed")
-		return element.ListVolumesResult{}, err
+		return &sftypes.ListVolumesResult{}, err
 	}
 
-	var result element.ListVolumesResult
-	if err := json.Unmarshal([]byte(*response), &result); err != nil {
-		log.Print("Failed to unmarshall response from ListVolumes")
-		return element.ListVolumesResult{}, err
-	}
-
-	return result, nil
+	return response, nil
 }
 
 func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("Updating volume access group %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
-	volume := ModifyVolumeRequest{}
+	volume := sftypes.ModifyVolumeRequest{}
 
 	id := d.Id()
-	convID, convErr := strconv.Atoi(id)
+	convID, convErr := strconv.ParseInt(id, 10, 64)
 
 	if convErr != nil {
 		return fmt.Errorf("id argument is required")
@@ -245,10 +189,8 @@ func resourceSolidFireVolumeUpdate(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func updateVolume(client *element.Client, request ModifyVolumeRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("ModifyVolume", params)
+func updateVolume(client *sfapi.Client, request sftypes.ModifyVolumeRequest) error {
+	_, err := client.ModifyVolume(request)
 	if err != nil {
 		log.Print("ModifyVolume request failed")
 		return err
@@ -259,24 +201,26 @@ func updateVolume(client *element.Client, request ModifyVolumeRequest) error {
 
 func resourceSolidFireVolumeDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("Deleting volume access group: %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
-	volume := DeleteVolumeRequest{}
+	deleteVolumeReq := sftypes.DeleteVolumeRequest{}
+	purgeVolumeReq := sftypes.PurgeDeletedVolumeRequest{}
 
 	id := d.Id()
-	convID, convErr := strconv.Atoi(id)
+	convID, convErr := strconv.ParseInt(id, 10, 64)
 
 	if convErr != nil {
 		return fmt.Errorf("id argument is required")
 	}
-	volume.VolumeID = convID
+	deleteVolumeReq.VolumeID = convID
+	purgeVolumeReq.VolumeID = convID
 
-	deleteErr := deleteVolume(client, volume)
+	deleteErr := deleteVolume(client, deleteVolumeReq)
 	if deleteErr != nil {
 		return deleteErr
 	}
 
-	purgeErr := purgeDeletedVolume(client, volume)
+	purgeErr := purgeDeletedVolume(client, purgeVolumeReq)
 	if purgeErr != nil {
 		return purgeErr
 	}
@@ -284,10 +228,8 @@ func resourceSolidFireVolumeDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func deleteVolume(client *element.Client, request DeleteVolumeRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("DeleteVolume", params)
+func deleteVolume(client *sfapi.Client, request sftypes.DeleteVolumeRequest) error {
+	err := client.DeleteVolume(request)
 	if err != nil {
 		log.Print("DeleteVolume request failed")
 		return err
@@ -296,10 +238,8 @@ func deleteVolume(client *element.Client, request DeleteVolumeRequest) error {
 	return nil
 }
 
-func purgeDeletedVolume(client *element.Client, request DeleteVolumeRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("PurgeDeletedVolume", params)
+func purgeDeletedVolume(client *sfapi.Client, request sftypes.PurgeDeletedVolumeRequest) error {
+	err := client.PurgeDeletedVolume(request)
 	if err != nil {
 		log.Print("PurgeDeletedVolume request failed")
 		return err
@@ -310,20 +250,20 @@ func purgeDeletedVolume(client *element.Client, request DeleteVolumeRequest) err
 
 func resourceSolidFireVolumeExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	log.Printf("Checking existence of volume: %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
-	volumes := element.ListVolumesRequest{}
+	volumes := sftypes.ListVolumesRequest{}
 
 	id := d.Id()
-	s := make([]int, 1)
-	convID, convErr := strconv.Atoi(id)
+	s := make([]int64, 1)
+	convID, convErr := strconv.ParseInt(id, 10, 64)
 
 	if convErr != nil {
 		return false, fmt.Errorf("id argument is required")
 	}
 
 	s[0] = convID
-	volumes.Volumes = s
+	volumes.VolumeIDs = s
 
 	res, err := listVolumes(client, volumes)
 	if err != nil {

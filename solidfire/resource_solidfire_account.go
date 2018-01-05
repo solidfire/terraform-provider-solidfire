@@ -5,36 +5,10 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/solidfire/solidfire-sdk-golang/sfapi"
 	"github.com/solidfire/solidfire-sdk-golang/sftypes"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element"
-	"github.com/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
-
-type CreateAccountRequest struct {
-	Username        string      `structs:"username"`
-	InitiatorSecret string      `structs:"initiatorSecret,omitempty"`
-	TargetSecret    string      `structs:"targetSecret,omitempty"`
-	Attributes      interface{} `structs:"attributes,omitempty"`
-}
-
-type CreateAccountResult struct {
-	Account element.Account `json:"account"`
-}
-
-type ModifyAccountRequest struct {
-	AccountID       int         `structs:"accountID"`
-	InitiatorSecret string      `structs:"initiatorSecret,omitempty"`
-	TargetSecret    string      `structs:"targetSecret,omitempty"`
-	Attributes      interface{} `structs:"attributes,omitempty"`
-	Username        string      `structs:"username,omitempty"`
-}
-
-type RemoveAccountRequest struct {
-	AccountID int `structs:"accountID"`
-}
 
 func resourceSolidFireAccount() *schema.Resource {
 	return &schema.Resource{
@@ -103,9 +77,9 @@ func resourceSolidFireAccountCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	d.SetId(fmt.Sprintf("%v", resp.Account.AccountID))
+	d.SetId(fmt.Sprintf("%v", resp.AccountID))
 
-	log.Printf("Created account: %v %v", acct.Username, resp.Account.AccountID)
+	log.Printf("Created account: %v %v", acct.Username, resp.AccountID)
 
 	return resourceSolidFireAccountRead(d, meta)
 }
@@ -160,16 +134,17 @@ func resourceSolidFireAccountRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceSolidFireAccountUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("Updating account %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
-	acct := ModifyAccountRequest{}
+	acct := sftypes.ModifyAccountRequest{}
 
 	id := d.Id()
-	convID, convErr := strconv.Atoi(id)
+	convID, convErr := strconv.ParseInt(id, 10, 64)
 
 	if convErr != nil {
 		return fmt.Errorf("id argument is required")
 	}
+
 	acct.AccountID = convID
 
 	if v, ok := d.GetOk("username"); ok {
@@ -177,11 +152,15 @@ func resourceSolidFireAccountUpdate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	if v, ok := d.GetOk("initiator_secret"); ok {
-		acct.InitiatorSecret = v.(string)
+		acct.InitiatorSecret = sftypes.CHAPSecret{
+			Secret: v.(string),
+		}
 	}
 
 	if v, ok := d.GetOk("target_secret"); ok {
-		acct.TargetSecret = v.(string)
+		acct.TargetSecret = sftypes.CHAPSecret{
+			Secret: v.(string),
+		}
 	}
 
 	err := modifyAccount(client, acct)
@@ -192,10 +171,8 @@ func resourceSolidFireAccountUpdate(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-func modifyAccount(client *element.Client, request ModifyAccountRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("ModifyAccount", params)
+func modifyAccount(client *sfapi.Client, request sftypes.ModifyAccountRequest) error {
+	err := client.ModifyAccount(request)
 	if err != nil {
 		log.Print("ModifyAccount request failed")
 		return err
@@ -206,12 +183,12 @@ func modifyAccount(client *element.Client, request ModifyAccountRequest) error {
 
 func resourceSolidFireAccountDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("Deleting account: %#v", d)
-	client := meta.(*element.Client)
+	client := meta.(*sfapi.Client)
 
-	acct := RemoveAccountRequest{}
+	acct := sftypes.RemoveAccountRequest{}
 
 	id := d.Id()
-	convID, convErr := strconv.Atoi(id)
+	convID, convErr := strconv.ParseInt(id, 10, 64)
 
 	if convErr != nil {
 		return fmt.Errorf("id argument is required")
@@ -226,12 +203,10 @@ func resourceSolidFireAccountDelete(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-func removeAccount(client *element.Client, request RemoveAccountRequest) error {
-	params := structs.Map(request)
-
-	_, err := client.CallAPIMethod("RemoveAccount", params)
+func removeAccount(client *sfapi.Client, request sftypes.RemoveAccountRequest) error {
+	err := client.RemoveAccount(request)
 	if err != nil {
-		log.Print("DeleteAccount request failed")
+		log.Print("RemoveAccount request failed")
 		return err
 	}
 
@@ -255,8 +230,8 @@ func resourceSolidFireAccountExists(d *schema.ResourceData, meta interface{}) (b
 
 	_, err := client.GetAccountByID(acct)
 	if err != nil {
-		if err, ok := err.(*jsonrpc.ResponseError); ok {
-			if err.Name == "xUnknownAccount" {
+		if err, ok := err.(*sfapi.ReqErr); ok {
+			if err.Name() == "xUnknownAccount" {
 				d.SetId("")
 				return false, nil
 			}

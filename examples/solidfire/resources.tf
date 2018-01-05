@@ -21,9 +21,9 @@ resource "solidfire_volume_access_group" "hackathon-group" {
     volumes = ["${solidfire_volume.hackathon-volume.*.id}"]
 }
 
-resource "solidfire_initiator" "hackathon-initiator" {
-    name = "iqn.1998-01.com.vmware:bdr-es65-7f17a50c"
-    alias = "Hackathon EUI Cluster"
-    volume_access_group_id = "${solidfire_volume_access_group.hackathon-group.id}"
-    iqns = ["${solidfire_volume.hackathon-volume.*.iqn}"]
-}
+// resource "solidfire_initiator" "hackathon-initiator" {
+//     name = "iqn.1998-01.com.vmware:bdr-es65-7f17a50c"
+//     alias = "Hackathon EUI Cluster"
+//     volume_access_group_id = "${solidfire_volume_access_group.hackathon-group.id}"
+//     iqns = ["${solidfire_volume.hackathon-volume.*.iqn}"]
+// }
