@@ -6,10 +6,10 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/cprokopiak/terraform-provider-solidfire/solidfire/element"
-	"github.com/cprokopiak/terraform-provider-solidfire/solidfire/element/jsonrpc"
 	"github.com/fatih/structs"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/solidfire/terraform-provider-solidfire/solidfire/element"
+	"github.com/solidfire/terraform-provider-solidfire/solidfire/element/jsonrpc"
 )
 
 type StorageDevice struct {

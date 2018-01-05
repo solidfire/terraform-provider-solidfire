@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/cprokopiak/terraform-provider-solidfire/solidfire"
 	"github.com/hashicorp/terraform/plugin"
+	"github.com/solidfire/terraform-provider-solidfire/solidfire"
 )
 
 func main() {

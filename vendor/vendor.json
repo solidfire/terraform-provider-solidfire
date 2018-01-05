@@ -17,6 +17,10 @@
 			"revisionTime": "2017-12-24T00:49:35Z"
 		},
 		{
+			"path": "fetch",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "PYNaEEt9v8iAvGVUD4do0YIeR1A=",
 			"origin": "github.com/hashicorp/terraform/vendor/github.com/Azure/go-ntlmssp",
 			"path": "github.com/Azure/go-ntlmssp",
@@ -209,10 +213,10 @@
 			"revisionTime": "2017-12-24T00:49:35Z"
 		},
 		{
-			"checksumSHA1": "gNO0JNpLzYOdInGeq7HqMZUzx9M=",
+			"checksumSHA1": "GCTVJ1J/SGZstNZauuLAnTFOhGA=",
 			"path": "github.com/armon/go-radix",
-			"revision": "4700a86ee6f29e80a3f3f55b93e90e804d261fdf",
-			"revisionTime": "2017-12-24T00:49:35Z"
+			"revision": "1fca145dffbcaa8fe914309b1ec0cfc67500fe61",
+			"revisionTime": "2017-07-27T15:54:43Z"
 		},
 		{
 			"checksumSHA1": "0hUWwavDCAEJQ4fv0WcWLSAvoRA=",
@@ -397,10 +401,10 @@
 			"revisionTime": "2017-12-24T00:49:35Z"
 		},
 		{
-			"checksumSHA1": "Isa9x3nvIJ12hvgdvUUBty+yplU=",
+			"checksumSHA1": "oTmBS67uxM6OXB/+OJUAG9LK4jw=",
 			"path": "github.com/bgentry/speakeasy",
-			"revision": "4700a86ee6f29e80a3f3f55b93e90e804d261fdf",
-			"revisionTime": "2017-12-24T00:49:35Z"
+			"revision": "4aabc24848ce5fd31929f7d1e4ea74d3709c14cd",
+			"revisionTime": "2017-04-17T20:07:03Z"
 		},
 		{
 			"checksumSHA1": "gntLgvUzJqZWf4NYxJr3p/3gcvk=",
@@ -567,10 +571,10 @@
 			"revisionTime": "2016-08-16T19:50:56Z"
 		},
 		{
-			"checksumSHA1": "S95DC3zwxtfOgIy3crWPAat4hRE=",
+			"checksumSHA1": "YAq1rqZIp+M74Q+jMBQkkMKm3VM=",
 			"path": "github.com/hashicorp/go-cleanhttp",
-			"revision": "4700a86ee6f29e80a3f3f55b93e90e804d261fdf",
-			"revisionTime": "2017-12-24T00:49:35Z"
+			"revision": "d5fe4b57a186c716b0e00b8c301cbd9b4182694d",
+			"revisionTime": "2017-12-18T14:54:08Z"
 		},
 		{
 			"checksumSHA1": "9VcI9QGCShWIUIL187qRd4sxwb8=",
@@ -2796,5 +2800,5 @@
 			"revision": ""
 		}
 	],
-	"rootPath": "github.com/cprokopiak/terraform-provider-solidfire"
+	"rootPath": "github.com/solidfire/terraform-provider-solidfire"
 }

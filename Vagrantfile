@@ -53,10 +53,10 @@ export PATH="$SRCROOT/bin:$SRCPATH/bin:\$PATH"
 EOF
 chmod 755 /etc/profile.d/gopath.sh
 
-grep -q -F 'cd /opt/gopath/src/github.com/cprokopiak/terraform-provider-solidfire' /home/vagrant/.bashrc || cat >>/home/vagrant/.bashrc <<EOF
+grep -q -F 'cd /opt/gopath/src/github.com/solidfire/terraform-provider-solidfire' /home/vagrant/.bashrc || cat >>/home/vagrant/.bashrc <<EOF
 
 ## After login, change to terraform-provider-solidfire directory
-cd /opt/gopath/src/github.com/cprokopiak/terraform-provider-solidfire
+cd /opt/gopath/src/github.com/solidfire/terraform-provider-solidfire
 EOF
 
 SCRIPT
@@ -67,7 +67,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "prepare-shell", type: "shell", inline: "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile", privileged: false
   config.vm.provision "initial-setup", type: "shell", inline: $script
-  config.vm.synced_folder '.', '/opt/gopath/src/github.com/cprokopiak/terraform-provider-solidfire'
+  config.vm.synced_folder '.', '/opt/gopath/src/github.com/solidfire/terraform-provider-solidfire'
 
   config.vm.provider "virtualbox" do |v|
     v.memory = "#{RAM}"
