@@ -25,11 +25,11 @@ official release announcement found [here][tf-0.10-announce].
 ## Full Provider Documentation
 
 The provider is documented in full on the Terraform website and can be found
-[here][tf-vsphere-docs]. Check the provider documentation for details on
+[here][tf-solidfire-docs]. Check the provider documentation for details on
 entering your connection information and how to get started with writing
 configuration for SolidFire resources.
 
-[tf-vsphere-docs]: https://www.terraform.io/docs/providers/solidfire/index.html
+[tf-solidfire-docs]: https://www.terraform.io/docs/providers/solidfire/index.html
 
 ### Controlling the provider version
 
