@@ -1956,12 +1956,6 @@
 			"revision": ""
 		},
 		{
-			"checksumSHA1": "4TsbAzAEGtrY1VOwutdemnIDAYA=",
-			"path": "github.com/solidfire/solidfire-sdk-golang",
-			"revision": "63703745da6ce173c1b5679014234b417bbb3d5a",
-			"revisionTime": "2017-04-07T18:59:08Z"
-		},
-		{
 			"checksumSHA1": "JXUVA1jky8ZX8w09p2t5KLs97Nc=",
 			"path": "github.com/stretchr/testify/assert",
 			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
