@@ -9,7 +9,9 @@ website][tf-website] and the [GitHub project page][tf-github].
 [tf-website]: https://terraform.io/
 [tf-github]: https://github.com/hashicorp/terraform
 
-This provider plugin is maintained by the SolidFire team at [SolidFire](https://www.solidfire.com/).
+This provider plugin was developed by the SolidFire team for use with internal
+projects. The provider plugin is being actively used, but is not being actively
+maintained.
 
 # Using the Provider
 
