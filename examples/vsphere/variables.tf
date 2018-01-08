@@ -17,3 +17,7 @@ variable "solidfire_api_version" {
 variable "total_size" {
   type = "list"
 }
+
+variable "datacenter" {
+  type = "string"
+}
