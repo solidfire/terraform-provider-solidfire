@@ -21,3 +21,15 @@ variable "total_size" {
 variable "datacenter" {
   type = "string"
 }
+
+variable "vsphere_username" {
+  type = "string"
+}
+
+variable "vsphere_password" {
+  type = "string"
+}
+
+variable "vsphere_server" {
+  type = "string"
+}

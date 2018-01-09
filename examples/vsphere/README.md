@@ -1,9 +1,13 @@
 # SolidFire 0.1.0 Example
 
 This repository is designed to demonstrate the capabilities of the [Terraform
-SolidFire Provider][ref-tf-solidfire] at the time of the 0.1.0 release.
+SolidFire Provider][ref-tf-solidfire] at the time of the 0.1.0 release, working
+in conjunction with the [Terraform vSphere Provider][ref-tf-vsphere].
 
 [ref-tf-solidfire]: https://www.terraform.io/docs/providers/solidfire/index.html
+[ref-tf-vsphere]: https://www.terraform.io/docs/providers/vsphere/index.html
+
+**NOTE:** This example is not completely working.
 
 This example performs the following:
 
@@ -13,7 +17,7 @@ This example performs the following:
   using the [`solidfire_volume` resource][ref-tf-solidfire-volume].
 * Sets up a volume access group for the volumes, using the
   [`solidfire_volume_access_group` resource][ref-tf-solidfire-volume-access-group].
-* Finally, creates an initiator tied to the volume access group and volumes using 
+* Creates an initiator tied to the volume access group and volumes using 
   the [`solidfire_initiator` resource][ref-tf-solidfire-initiator].
 
 [ref-tf-solidfire-account]: https://www.terraform.io/docs/providers/solidfire/r/account.html
