@@ -1,0 +1,35 @@
+<% wrap_layout :inner do %>
+    <% content_for :sidebar do %>
+      <div class="docs-sidebar hidden-print affix-top" role="complementary">
+        <ul class="nav docs-sidenav">
+          <li<%= sidebar_current("docs-home") %>>
+            <a href="/docs/providers/index.html">All Providers</a>
+          </li>
+  
+          <li<%= sidebar_current("docs-solidfire-index") %>>
+            <a href="/docs/providers/solidfire/index.html">SolidFire Provider</a>
+          </li>
+  
+          <li<%= sidebar_current("docs-solidfire-resource") %>>
+            <a href="#">Resources</a>
+            <ul class="nav nav-visible">
+              <li<%= sidebar_current("docs-solidfire-resource-account") %>>
+                <a href="/docs/providers/solidfire/r/account.html">solidfire_account</a>
+              </li>
+              <li<%= sidebar_current("docs-solidfire-resource-initiator") %>>
+                <a href="/docs/providers/solidfire/r/initiator.html">solidfire_initiator</a>
+              </li>
+              <li<%= sidebar_current("docs-solidfire-resource-volume-access-group") %>>
+                <a href="/docs/providers/solidfire/r/volume-access-group.html">solidfire_volume_access_group</a>
+              </li>
+              <li<%= sidebar_current("docs-solidfire-resource-volume") %>>
+                <a href="/docs/providers/solidfire/r/volume.html">solidfire_volume</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+  
+    <%= yield %>
+  <% end %>
