@@ -7,7 +7,7 @@ provider "solidfire" {
 }
 
 provider "vsphere" {
-    version = "~> 1.1"
+    version = "~> 1.3"
     user = "${var.vsphere_username}"
     password = "${var.vsphere_password}"
     vsphere_server = "${var.vsphere_server}"

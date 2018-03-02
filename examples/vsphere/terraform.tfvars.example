@@ -13,3 +13,16 @@ total_size = [
     "400000000000",
     "500000000000",
 ]
+
+vsphere_datacenter = "NetApp-HCI-Datacenter"
+
+vsphere_username = "administrator@vsphere.local"
+
+vsphere_password = "password"
+
+vsphere_server = "server.vmware.com"
+
+vsphere_hosts = [
+    "192.168.1.2",
+    "192.168.1.3"
+]

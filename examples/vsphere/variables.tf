@@ -18,7 +18,7 @@ variable "total_size" {
   type = "list"
 }
 
-variable "datacenter" {
+variable "vsphere_datacenter" {
   type = "string"
 }
 
@@ -32,4 +32,8 @@ variable "vsphere_password" {
 
 variable "vsphere_server" {
   type = "string"
+}
+
+variable "vsphere_hosts" {
+  type = "list"
 }
