@@ -1,6 +1,6 @@
 # Official Terraform Provider for NetApp Element Software
 
-[Terraform NetApp ElementSW Provider](https://github.com/NetApp/terraform-provider-netapp-elementsw/) contains a refactored and updated version based on this code. Please use the new official repository for downloads, documentations and issues.
+[Terraform NetApp ElementSW Provider](https://github.com/NetApp/terraform-provider-netapp-elementsw/) contains a refactored and updated version based on this code. Please use the new official repository for downloads, documentation and issues.
 
 Below information and code in this repository is left for reference purposes.
 
